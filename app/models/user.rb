@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  
+
   devise :database_authenticatable,
          :registerable,
          :recoverable,
@@ -12,13 +12,14 @@ class User < ApplicationRecord
   has_many :tests, through: :test_passages
   has_many :gists, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
+  has_and_belongs_to_many :badges
 
   validates :email, uniqueness: true, format: { with: /.+@.+\..+/i }
 
   def test_passage(test)
     test_passages.order(id: :desc).find_by(test_id: test.id)
   end
-  
+
   def tests_passage(level)
     Test
       .joins(:test_passages)

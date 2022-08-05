@@ -8,7 +8,7 @@ class TestPassage < ApplicationRecord
   has_many :questions, dependent: :destroy
 
   before_validation :before_validation_set_current_question, on: %i[create update]
-  
+  before_save :set_success_value
 
   def success?
     percentage_of_correct_answers >= PASS_TEST_PERCENT
@@ -42,7 +42,23 @@ class TestPassage < ApplicationRecord
     (current_question_index.to_f / test.questions.count.to_f) * 100
   end
 
+  def overtime?(end_time)
+    Time.current > end_time
+  end
+
+  def end_time
+    created_at + test.duration.seconds
+  end
+
+  def seconds_left
+    (end_time - Time.current).to_i
+  end
+
   private
+
+  def set_success_value
+    self.success = success?
+  end
 
   def before_validation_set_current_question
     self.current_question =
